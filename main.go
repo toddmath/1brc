@@ -51,7 +51,7 @@ func main() {
 }
 
 func evalutate() string {
-	mapOfTemp, err := readFileLineByLineIntoAMap("./test_cases/measurements-1.txt")
+	mapOfTemp, err := readFileLineByLineIntoAMap("./test_cases/measurements-20.txt")
 	if err != nil {
 		panic(err)
 	}
@@ -70,16 +70,23 @@ func evalutate() string {
 		wg.Add(1)
 		go func(city string, temps []float64) {
 			defer wg.Done()
-			sort.Float64s(temps)
 
-			var avg float64
+			var min, max, avg float64
+			min, max = math.MaxFloat64, 0
+
 			for _, temp := range temps {
+				if temp < min {
+					min = temp
+				}
+				if temp > max {
+					max = temp
+				}
 				avg += temp
 			}
 			avg = avg / float64(len(temps))
 			avg = math.Ceil(avg*10) / 10
 
-			updateResult(fmt.Sprintf("%s=%.1f/%.1f/%.1f", city, temps[0], avg, temps[len(temps)-1]))
+			updateResult(fmt.Sprintf("%s=%.1f/%.1f/%.1f", city, min, avg, max))
 		}(city, temps)
 	}
 
